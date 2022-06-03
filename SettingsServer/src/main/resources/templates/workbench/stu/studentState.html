@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" type="text/css">
+<link rel="stylesheet" th:href="@{/css/pagination.min.css}" type="text/css">
+<script type="text/javascript" th:src="@{/js/bootstrap.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/jquery-3.6.0.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/pagination.js}"></script>
+<script type="text/javascript" th:inline="javascript">
+    $(function() {
+        getStudentState();
+    })
+    function getStudentState() {
+        var url=/*[[@{/workbench/stuCourse/getStudentStateById}]]*/+"";
+        var studentId=/*[[${session.student.id}]]*/+"";
+        $.ajax({
+            url: url,
+            type: "get",
+            data: {
+                studentId: studentId
+            },
+            dataType : "json",
+            success: function (data) {
+                if (data.code === "success") {
+                    var html="";
+                    html+="<div class=\"col-2\">";
+                    html+="    <ul>";
+                    html+="        <li id=\"studentName\">"+data.data.studentName+"</li>";
+                    html+="        <li id=\"studentId\">"+data.data.studentId+"</li>";
+                    html+="        <li id=\"addCredit\">"+data.data.totalCredit+"</li>";
+                    html+="        <li id=\"passCourseNum\">"+data.data.passedCourseNum+"</li>";
+                    html+="        <li id=\"failCourseNum\">"+data.data.failedCourseNum+"</li>";
+                    html+="        <li id=\"averageScore\">"+data.data.averageScore+"</li>";
+                    html+="        <li id=\"no\">"+data.data.no+"</li>";
+                    html+="    </ul>";
+                    html+="</div>";
+                    $("#catalogDiv").after(html);
+                } else {
+                    alert(data.message);
+                }
+            }
+        })
+    }
+</script>
+<style type="text/css">
+    ul{
+        list-style-type: none;
+    }
+    ul>li{
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+</style>
+<body>
+    <p>学习情况</p>
+    <hr>
+    <div id="showDiv" class="row">
+        <div class="col-2 text-muted" id="catalogDiv">
+            <ul>
+                <li>姓名</li>
+                <li>学号</li>
+                <li>已获学分</li>
+                <li>通过课程门数</li>
+                <li>不及格课程门数</li>
+                <li>平均分</li>
+                <li>排名</li>
+            </ul>
+        </div>
+<!--        <div class="col-2">-->
+<!--            <ul>-->
+<!--                <li id="studentName">山鬼谣</li>-->
+<!--                <li id="studentId">210435</li>-->
+<!--                <li id="addCredit">42</li>-->
+<!--                <li id="passCourseNum">21</li>-->
+<!--                <li id="failCourseNum">2</li>-->
+<!--                <li id="averageScore">78</li>-->
+<!--                <li id="no">2</li>-->
+<!--            </ul>-->
+<!--        </div>-->
+    </div>
+</body>
+</html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" type="text/css">
+<link rel="stylesheet" th:href="@{/css/pagination.min.css}" type="text/css">
+<script type="text/javascript" th:src="@{/js/bootstrap.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/jquery-3.6.0.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/pagination.js}"></script>
+<script type="text/javascript" th:inline="javascript">
+    $(function() {
+        $("#dataDiv").on("click",".editSCBtn",function() {
+            var id = $(this).attr("data-id");
+            $("#modalEditBtn").attr("data-id",id);
+            $("#editModal").modal("show");
+        })
+        $("#modalEditBtn").on("click", function() {
+            var id = $(this).attr("data-id");
+            var score = $.trim($("#scoreSpan").val());
+            if (score === "") {
+                alert("请输入成绩！");
+                return;
+            }
+            var reg=/^[1-9]\d*$/;
+            if(reg.test(score)===false){
+                alert("成绩必须是正整数！");
+                return;
+            }
+            var url=/*[[@{/workbench/stuCourse/updateCourseStudent}]]*/
+            $.ajax({
+                url: url,
+                data: {
+                    id: id,
+                    score: score
+                },
+                success: function(data) {
+                    if (data.code === "success") {
+                        alert("修改成功！");
+                        $("#editModal").modal("hide");
+                        var select=$("#selectCom").val();
+                        if (select==='1') {
+                            getListOk(5,1)
+                        }else {
+                            getList(5,1)
+                        }
+                    } else {
+                        alert("修改失败！");
+                    }
+                }
+            })
+        })
+        getList(5,1);
+        $("#selectCom").on("change",function() {
+            var select=$(this).val();
+            if (select==='1') {
+                getListOk(5,1)
+            }else {
+                getList(5,1)
+            }
+        })
+    })
+    function getList(pageSize,pageNum) {
+        var url=/*[[@{/workbench/stuCourse/getCourseStudent}]]*/+"";
+        var courseId=$("#courseIdSpan").text();
+        $.ajax({
+            url: url,
+            data: {
+                pageSize: pageSize,
+                pageNum: pageNum,
+                courseId:courseId
+            },
+            type : "GET",
+            dataType : "json",
+            success: function(data) {
+                if (data.code === "success") {
+                    var html = "";
+                    $.each(data.data.list,function (index,item) {
+                        html+="<div class=\"courseDiv row border-top ms-2\">";
+                        html+="    <p class=\"col-1 mt-3\">"+item.courseId+"</p>";
+                        html+="    <p class=\"col-2 mt-3\">"+item.courseName+"</p>";
+                        html+="    <p class=\"col-1 mt-3\">"+item.studentId+"</p>";
+                        html+="    <p class=\"col-1 mt-3\">"+item.studentName+"</p>";
+                        html+="    <p class=\"col-1 mt-3\">未完成</p>";
+                        html+="    <p class=\"col-2 mt-3\">未完成</p>";
+                        html+="    <p class=\"col-1 mt-3\"><a data-id='"+item.id+"' class=\"editSCBtn\">修改</a></p>";
+                        html+="</div>";
+                    })
+                    $("#dataDiv").html(html);
+                    new Pagination({
+                        element: '.pageDiv', // 渲染的容器  [必填]
+                        layout: 'total,sizes,home, prev, pager, next, last', // [必填]
+                        pageIndex: pageNum, // 当前页码 [非必填]
+                        pageSize: pageSize, // 每页显示条数
+                        total: data.data.length, // 数据总条数 [必填]
+                        currentChange: function (index, pageSize) { // 页码
+                            getList(pageSize, index);
+                        }
+                    });
+                } else {
+                    alert(data.message);
+                }
+            }
+        })
+    }
+    function getListOk(pageSize,pageNum) {
+        var url=/*[[@{/workbench/stuCourse/getCourseStudentOk}]]*/+"";
+        var courseId=$("#courseIdSpan").text();
+        $.ajax({
+            url: url,
+            data: {
+                pageSize: pageSize,
+                pageNum: pageNum,
+                courseId:courseId
+            },
+            type : "GET",
+            dataType : "json",
+            success: function(data) {
+                if (data.code === "success") {
+                    var html = "";
+                    $.each(data.data.list,function (index,item) {
+                        html+="<div class=\"courseDiv row border-top ms-2\">";
+                        html+="    <p class=\"col-1 mt-3\">"+item.courseId+"</p>";
+                        html+="    <p class=\"col-2 mt-3\">"+item.courseName+"</p>";
+                        html+="    <p class=\"col-1 mt-3\">"+item.studentId+"</p>";
+                        html+="    <p class=\"col-1 mt-3\">"+item.studentName+"</p>";
+                        html+="    <p class=\"col-1 mt-3\">"+item.score+"</p>";
+                        html+="    <p class=\"col-2 mt-3\">"+item.examDate+"</p>";
+                        html+="    <p class=\"col-1 mt-3\"><a data-id='"+item.id+"' class=\"editSCBtn\">修改</a></p>";
+                        html+="</div>";
+                    })
+                    $("#dataDiv").html(html);
+                    new Pagination({
+                        element: '.pageDiv', // 渲染的容器  [必填]
+                        layout: 'total,sizes,home, prev, pager, next, last', // [必填]
+                        pageIndex: pageNum, // 当前页码 [非必填]
+                        pageSize: pageSize, // 每页显示条数
+                        total: data.data.length, // 数据总条数 [必填]
+                        currentChange: function (index, pageSize) { // 页码
+                            getListOk(pageSize, index);
+                        }
+                    });
+                } else {
+                    alert(data.message);
+                }
+            }
+        })
+    }
+</script>
+<style type="text/css">
+    a{
+        color: black;
+        text-decoration: none;
+    }
+    a:hover{
+        color: #0c63e4;
+    }
+    .courseDiv{
+        height: 50px;
+        /*background-color: #cff4fc;*/
+    }
+    .courseDiv:hover{
+        background-color: #86b7fe;
+    }
+</style>
+<body>
+<div class="d-flex justify-content-between">
+    <p class="my-auto">学生列表</p>
+    <span th:text="${#request.getParameter('courseId')}" hidden id="courseIdSpan"></span>
+    <select name="recordType" class="me-4" id="selectCom">
+        <option value="0" selected>未完成名单</option>
+        <option value="1">已完成名单</option>
+    </select>
+</div>
+<hr>
+<div>
+    <div class="courseDiv row small text-muted ms-2">
+        <p class="col-1 mt-3">课程编号</p>
+        <p class="col-2 mt-3">课程名</p>
+        <p class="col-1 mt-3">学号</p>
+        <p class="col-1 mt-3">姓名</p>
+        <p class="col-1 mt-3">成绩</p>
+        <p class="col-2 mt-3">完成时间</p>
+    </div>
+    <div id="dataDiv">
+<!--        <div class="courseDiv row border-top ms-2">-->
+<!--            <p class="col-1 mt-3">CK67HU</p>-->
+<!--            <p class="col-2 mt-3">高等数学</p>-->
+<!--            <p class="col-1 mt-3">804321</p>-->
+<!--            <p class="col-1 mt-3">胡新德</p>-->
+<!--            <p class="col-1 mt-3">78</p>-->
+<!--            <p class="col-2 mt-3">2022-10-21</p>-->
+<!--            <p class="col-1 mt-3"><a data-id="79425552" class="editSCBtn">修改</a></p>-->
+<!--        </div>-->
+<!--        <div class="courseDiv row border-top ms-2">-->
+<!--            <p class="col-1 mt-3">CK67HU</p>-->
+<!--            <p class="col-2 mt-3">高等数学</p>-->
+<!--            <p class="col-1 mt-3">804321</p>-->
+<!--            <p class="col-1 mt-3">胡新德</p>-->
+<!--            <p class="col-1 mt-3">未完成</p>-->
+<!--            <p class="col-2 mt-3">未完成</p>-->
+<!--            <p class="col-1 mt-3"><a data-id="79425552" class="editSCBtn">修改</a></p>-->
+<!--        </div>-->
+    </div>
+    <div class="pageDiv"></div>
+    <div class="modal" tabindex="-1" id="editModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">修改成绩</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body m-auto">
+                    <label>
+                        <input type="text" name="score" id="scoreSpan" placeholder="成绩" class="form-control">
+                    </label>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="modalEditBtn">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

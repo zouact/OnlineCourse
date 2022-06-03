@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" type="text/css">
+<link rel="stylesheet" th:href="@{/css/pagination.min.css}" type="text/css">
+<script type="text/javascript" th:src="@{/js/bootstrap.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/jquery-3.6.0.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/pagination.js}"></script>
+<script type="text/javascript" th:inline="javascript">
+    $(function() {
+        queryList(5,1);
+        $("#queryBtn").on("click",function () {
+            var studentName = $("#studentNameParam").val();
+            var studentId = $("#studentIdParam").val();
+            queryListByCondition(5,1,studentName,studentId);
+        });
+    })
+    function queryList(pageSize,pageNum){
+        var url=/*[[@{/workbench/student/queryByPage}]]*/+"";
+        $.ajax({
+            url: url,
+            type: "post",
+            data: {
+                "pageSize": pageSize,
+                "pageNum": pageNum
+            },
+            dataType: "json",
+            success: function(data){
+                if(data.code==="success"){
+                    var html="";
+                    $.each(data.data.students,function (index,item) {
+                        var href=/*[[@{/workbench/admin/studentCourse}]]*/+"";
+                        href+="?stuId="+item.id;
+                       html+="<div class=\"courseDiv row border-top ms-2\">";
+                       html+="    <p class=\"col-1 mt-3\">"+item.studentId+"</p>";
+                       html+="    <p class=\"col-1 mt-3\">"+item.studentName+"</p>";
+                       html+="    <p class=\"col-1 mt-3\"><a href=\""+href+"\" data-id='"+item.id+"'>查看课程</a></p>";
+                       html+="</div>";
+                    })
+                    $("#dataDiv").html(html);
+                    new Pagination({
+                        element: '#pageDiv', // 渲染的容器  [必填]
+                        layout: 'total,sizes,home, prev, pager, next, last', // [必填]
+                        pageIndex: pageNum, // 当前页码 [非必填]
+                        pageSize: pageSize, // 每页显示条数
+                        total: data.data.length, // 数据总条数 [必填]
+                        currentChange: function (index, pageSize) { // 页码
+                            queryList(pageSize, index);
+                        }
+                    });
+                }
+            }
+        })
+    }
+    function queryListByCondition(pageSize,pageNum,studentName,studentId){
+        var url=/*[[@{/workbench/student/queryByCondition}]]*/+"";
+        $.ajax({
+            url: url,
+            type: "post",
+            data: {
+                "pageSize": pageSize,
+                "pageNum": pageNum,
+                "studentName":studentName,
+                "studentId":studentId
+            },
+            dataType: "json",
+            success: function(data){
+                if(data.code==="success"){
+                    var html="";
+                    $.each(data.data.students,function (index,item) {
+                        var href=/*[[@{/workbench/admin/studentCourse}]]*/+"";
+                        href+="?stuId="+item.id;
+                        html+="<div class=\"courseDiv row border-top ms-2\">";
+                        html+="    <p class=\"col-1 mt-3\">"+item.studentId+"</p>";
+                        html+="    <p class=\"col-1 mt-3\">"+item.studentName+"</p>";
+                        html+="    <p class=\"col-1 mt-3\"><a href=\""+href+"\" data-id='"+item.id+"'>查看课程</a></p>";
+                        html+="</div>";
+                    })
+                    $("#dataDiv").html(html);
+                    new Pagination({
+                        element: '#pageDiv', // 渲染的容器  [必填]
+                        layout: 'total,sizes,home, prev, pager, next, last', // [必填]
+                        pageIndex: pageNum, // 当前页码 [非必填]
+                        pageSize: pageSize, // 每页显示条数
+                        total: data.data.length, // 数据总条数 [必填]
+                        currentChange: function (index, pageSize) { // 页码
+                            queryListByCondition(pageSize, index);
+                        }
+                    });
+                }
+            }
+        })
+    }
+</script>
+<style type="text/css">
+    a{
+        color: black;
+        text-decoration: none;
+    }
+    a:hover{
+        color: #0c63e4;
+    }
+    .courseDiv{
+        height: 50px;
+        /*background-color: #cff4fc;*/
+    }
+    .courseDiv:hover{
+        background-color: #86b7fe;
+    }
+</style>
+<body>
+<div id="controlDiv">
+    <form  class="py-4 row">
+        <div class="col-2">
+            <input type="text" name="studentName" placeholder="姓名" class="form-control" id="studentNameParam">
+        </div>
+        <div class="col-2">
+            <input id="studentIdParam" type="text" name="studentId" placeholder="学号" class="form-control">
+        </div>
+        <div class="col-1">
+            <button type="button" class="btn btn-primary" id="queryBtn">查询</button>
+        </div>
+    </form>
+</div>
+<p class="my-auto">学生列表</p>
+<hr>
+<div>
+    <div class="courseDiv row small text-muted ms-2">
+        <p class="col-1 mt-3">学号</p>
+        <p class="col-1 mt-3">姓名</p>
+        <p class="col-1 mt-3">操作</p>
+    </div>
+    <div id="dataDiv">
+<!--        <div class="courseDiv row border-top ms-2">-->
+<!--            <p class="col-1 mt-3">096100</p>-->
+<!--            <p class="col-1 mt-3">玄奇</p>-->
+<!--            <p class="col-1 mt-3"><a th:href="@{/workbench/admin/studentCourse}">查看课程</a></p>-->
+<!--        </div>-->
+    </div>
+    <div id="pageDiv"></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.master.springcloud.server.workbench.mapper.StuCourseMapper">
+
+    <resultMap id="BaseResultMap" type="com.master.springcloud.server.workbench.domain.StuCourse">
+            <id property="id" column="id" jdbcType="VARCHAR"/>
+            <result property="studentId" column="student_id" jdbcType="VARCHAR"/>
+            <result property="courseId" column="course_id" jdbcType="VARCHAR"/>
+            <result property="score" column="score" jdbcType="INTEGER"/>
+            <result property="examDate" column="exam_date" jdbcType="VARCHAR"/>
+    </resultMap>
+
+
+    <sql id="Base_Column_List">
+        id,student_id,course_id,
+        score,exam_date
+    </sql>
+    <select id="getStudentCourse" resultType="com.master.springcloud.server.workbench.domain.StudentCourse">
+        select sc.id,c.course_id,c.course_name,c.credit,c.theory_hour,c.pratice_hour,c.exam_mode,sc.score,sc.exam_date
+        from stu_course sc
+        join course c on sc.course_id = c.id
+        where sc.student_id=#{stuId} and sc.score is null and sc.exam_date is null
+    </select>
+    <select id="getStudentCourseOK" resultType="com.master.springcloud.server.workbench.domain.StudentCourse">
+        select sc.id,c.course_id,c.course_name,c.credit,c.theory_hour,c.pratice_hour,c.exam_mode,sc.score,sc.exam_date
+        from stu_course sc
+        join course c on sc.course_id = c.id
+        where sc.student_id=#{stuId} and sc.score is not null and sc.exam_date is not null
+    </select>
+
+    <select id="getCoursePassedCount" resultType="java.util.Map">
+        SELECT sum(c.credit) as total_credit,count(sc.score) AS passed_course_num
+        FROM stu_course sc
+        join course c on sc.course_id=c.id
+        WHERE sc.score>=60 AND sc.student_id=#{stuId}
+        GROUP BY sc.student_id
+    </select>
+    <select id="getCourseFailedCount" resultType="java.lang.Long">
+        SELECT count(sc.score) AS failed_course_num
+        FROM stu_course sc
+        join course c on sc.course_id=c.id
+        WHERE sc.score &lt; 60 AND sc.student_id=#{stuId}
+        GROUP BY sc.student_id
+    </select>
+    <select id="getCourseStudent" resultType="com.master.springcloud.server.workbench.domain.CourseStudent">
+        select sc.id,s.student_id,s.student_name,c.course_id,c.course_name,sc.score,sc.exam_date
+        from stu_course sc
+        join student s on sc.student_id=s.id
+        join course c on sc.course_id = c.id
+        where sc.course_id=#{courseId} and sc.score is null and sc.exam_date is null
+    </select>
+    <select id="getCourseStudentOK" resultType="com.master.springcloud.server.workbench.domain.CourseStudent">
+        select sc.id,s.student_id,s.student_name,c.course_id,c.course_name,sc.score,sc.exam_date
+        from stu_course sc
+                 join student s on sc.student_id=s.id
+                 join course c on sc.course_id = c.id
+        where sc.course_id=#{courseId} and sc.score is not null and sc.exam_date is not null
+    </select>
+
+
+</mapper>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" type="text/css">
+<script type="text/javascript" th:src="@{/js/bootstrap.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/jquery-3.6.0.min.js}"></script>
+<script type="text/javascript" th:inline="javascript">
+    $(function() {
+        $("#onlineCrBtn").click(function() {
+            $("#myTitle").html(">>课程信息");
+            window.open(/*[[@{/workbench/admin/course}]]*/+"","showFrame");
+        })
+        $("#myCrBtn").click(function() {
+            $("#myTitle").html(">>学生信息");
+            window.open(/*[[@{/workbench/admin/student}]]*/+"","showFrame");
+        })
+        $("#stuStateBtn").click(function() {
+            $("#myTitle").html(">>学习情况统计");
+            window.open(/*[[@{/workbench/admin/study}]]*/+"","showFrame");
+        })
+        $("#logoutBtn").click(function() {
+            window.location.href=/*[[@{/workbench/admin/logout}]]*/+"";
+        })
+    })
+</script>
+<style type="text/css">
+    a{
+        text-decoration: none;
+        color: black;
+    }
+    a:hover{
+        color: #0d6efd;
+    }
+    .linkDiv{
+        padding: 1rem;
+    }
+    .mySidebar{
+        background-color: #eeeeee;
+        height: 760px;
+    }
+    .topBar{
+        background-color: #eeeeee;
+        height: 60px;
+    }
+    #showFrame{
+        position: absolute;
+        top: 90px;
+        left: 300px;
+        width: 1200px;
+        height: 650px;
+    }
+
+</style>
+<body>
+    <div class="container-fluid m-auto">
+        <div class="row">
+        <div class="col-2 ms-0 mySidebar">
+            <div class="d-flex align-content-center justify-content-center row mt-5 mb-4">
+                <div class="text-center col-6">
+                    <img th:src="@{/img/custom.jpg}" class="rounded img-thumbnail" alt="头像" src="#">
+                </div>
+                <div class="text-center mt-3">欢迎你！<span th:text="${session.admin.account}"></span></div>
+                <div class="text-center mt-3"><a href="#" id="logoutBtn">退出登录</a></div>
+            </div>
+            <div class="linkDiv text-center border-1 border-secondary border-top">
+                <h5><a href="#" id="onlineCrBtn">课程信息</a></h5>
+            </div>
+            <div class="linkDiv text-center border-1 border-secondary border-top">
+                <h5><a href="#" id="myCrBtn">学生信息</a></h5>
+            </div>
+            <div class="linkDiv text-center border-1 border-secondary border-top">
+                <h5><a href="#" id="stuStateBtn">学习情况统计</a></h5>
+            </div>
+        </div>
+        <div class="col-10">
+            <div class="topBar row border-start py-3">
+                <h5 id="myTitle">>>课程信息</h5>
+            </div>
+            <div id="showDiv">
+                <iframe th:src="@{/workbench/admin/course}" name="showFrame"  frameborder="0" id="showFrame" scrolling="no"></iframe>
+            </div>
+        </div>
+        </div>
+    </div>
+</body>
+</html>

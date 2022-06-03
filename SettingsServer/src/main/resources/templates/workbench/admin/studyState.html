@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" type="text/css">
+<link rel="stylesheet" th:href="@{/css/pagination.min.css}" type="text/css">
+<script type="text/javascript" th:src="@{/js/bootstrap.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/jquery-3.6.0.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/pagination.js}"></script>
+<script type="text/javascript" th:inline="javascript">
+    $(function() {
+        getList(5,1);
+        $("#queryBtn").on("click",function () {
+            var studentName = $("#studentNameParam").val();
+            var studentId = $("#studentIdParam").val();
+            getListByCondition(5,1,studentName,studentId);
+        });
+    })
+    function getList(pageSize,pageNum) {
+        var url=/*[[@{/workbench/stuCourse/getStudentState}]]*/+"";
+        $.ajax({
+            url : url,
+            type : "get",
+            dataType : "json",
+            data: {
+                "pageSize" : pageSize,
+                "pageNum" : pageNum
+            },
+            success:function(data) {
+                if (data.code === "success") {
+                    var html="";
+                    $.each(data.data.data,function (index,item) {
+                        html+="<div class=\"courseDiv row border-top ms-2\">";
+                        html+="    <p class=\"col-1 mt-3\">"+item.studentName+"</p>";
+                        html+="    <p class=\"col-1 mt-3\">"+item.studentId+"</p>";
+                        html+="    <p class=\"col-1 mt-3\">"+item.totalCredit+"</p>";
+                        html+="    <p class=\"col-2 mt-3\">"+item.passedCourseNum+"</p>";
+                        html+="    <p class=\"col-2 mt-3\">"+item.failedCourseNum+"</p>";
+                        html+="    <p class=\"col-1 mt-3\">"+item.averageScore+"</p>";
+                        html+="    <p class=\"col-1 mt-3\">"+item.no+"</p>";
+                        html+="</div>";
+                    })
+                    $("#dataDiv").html(html);
+                    new Pagination({
+                        element: '#pageDiv', // 渲染的容器  [必填]
+                        layout: 'total,sizes,home, prev, pager, next, last', // [必填]
+                        pageIndex: pageNum, // 当前页码 [非必填]
+                        pageSize: pageSize, // 每页显示条数
+                        total: data.data.length, // 数据总条数 [必填]
+                        currentChange: function (index, pageSize) { // 页码
+                            getList(pageSize, index);
+                        }
+                    });
+                }
+            }
+        })
+    }
+    function getListByCondition(pageSize,pageNum,studentName,studentId) {
+        var url=/*[[@{/workbench/stuCourse/getStudentStateByCondition}]]*/+"";
+        $.ajax({
+            url : url,
+            type : "get",
+            dataType : "json",
+            data: {
+                "pageSize" : pageSize,
+                "pageNum" : pageNum,
+                "studentName" : studentName,
+                "studentId" : studentId
+            },
+            success:function(data) {
+                if (data.code === "success") {
+                    var html="";
+                    $.each(data.data.data,function (index,item) {
+                        html+="<div class=\"courseDiv row border-top ms-2\">";
+                        html+="    <p class=\"col-1 mt-3\">"+item.studentName+"</p>";
+                        html+="    <p class=\"col-1 mt-3\">"+item.studentId+"</p>";
+                        html+="    <p class=\"col-1 mt-3\">"+item.totalCredit+"</p>";
+                        html+="    <p class=\"col-2 mt-3\">"+item.passedCourseNum+"</p>";
+                        html+="    <p class=\"col-2 mt-3\">"+item.failedCourseNum+"</p>";
+                        html+="    <p class=\"col-1 mt-3\">"+item.averageScore+"</p>";
+                        html+="    <p class=\"col-1 mt-3\">"+item.no+"</p>";
+                        html+="</div>";
+                    })
+                    $("#dataDiv").html(html);
+                    new Pagination({
+                        element: '#pageDiv', // 渲染的容器  [必填]
+                        layout: 'total,sizes,home, prev, pager, next, last', // [必填]
+                        pageIndex: pageNum, // 当前页码 [非必填]
+                        pageSize: pageSize, // 每页显示条数
+                        total: data.data.length, // 数据总条数 [必填]
+                        currentChange: function (index, pageSize) { // 页码
+                            getListByCondition(pageSize, index);
+                        }
+                    });
+                }
+            }
+        })
+    }
+</script>
+<style type="text/css">
+    a{
+        color: black;
+        text-decoration: none;
+    }
+    a:hover{
+        color: #0c63e4;
+    }
+    .courseDiv{
+        height: 50px;
+        /*background-color: #cff4fc;*/
+    }
+    .courseDiv:hover{
+        background-color: #86b7fe;
+    }
+</style>
+<body>
+<div id="controlDiv">
+    <form  class="py-4 row">
+        <div class="col-2">
+            <input type="text" name="studentName" placeholder="姓名" class="form-control" id="studentNameParam">
+        </div>
+        <div class="col-2">
+            <input id="studentIdParam" type="text" name="studentId" placeholder="学号" class="form-control">
+        </div>
+        <div class="col-1">
+            <button type="button" class="btn btn-primary" id="queryBtn">查询</button>
+        </div>
+    </form>
+</div>
+<p class="my-auto">学生学习情况列表</p>
+<hr>
+<div>
+    <div class="courseDiv row small text-muted ms-2">
+        <p class="col-1 mt-3">姓名</p>
+        <p class="col-1 mt-3">学号</p>
+        <p class="col-1 mt-3">已获学分</p>
+        <p class="col-2 mt-3">通过课程门数</p>
+        <p class="col-2 mt-3">不及格课程门数</p>
+        <p class="col-1 mt-3">平均分</p>
+        <p class="col-1 mt-3">排名</p>
+    </div>
+    <div id="dataDiv">
+<!--        <div class="courseDiv row border-top ms-2">-->
+<!--            <p class="col-1 mt-3">常信诺</p>-->
+<!--            <p class="col-1 mt-3">904421</p>-->
+<!--            <p class="col-1 mt-3">3</p>-->
+<!--            <p class="col-2 mt-3">23</p>-->
+<!--            <p class="col-2 mt-3">2</p>-->
+<!--            <p class="col-1 mt-3">1</p>-->
+<!--        </div>-->
+    </div>
+    <div id="pageDiv"></div>
+</div>
+</body>
+</html>

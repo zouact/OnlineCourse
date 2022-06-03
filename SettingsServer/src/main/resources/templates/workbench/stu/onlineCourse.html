@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" type="text/css">
+<link rel="stylesheet" th:href="@{/css/pagination.min.css}" type="text/css">
+<script type="text/javascript" th:src="@{/js/bootstrap.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/jquery-3.6.0.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/pagination.js}"></script>
+<script type="text/javascript" th:inline="javascript">
+    $(function() {
+        // alert("加载数据！");
+        $("#queryBtn").on("click",function() {
+            var courseId=$("#courseId").val();
+            var courseName=$("#courseName").val();
+            getCoursesByCondition(5,1,courseName,courseId);
+        })
+        $("#dataDiv").on("click",".saveScBtn", function() {
+            var courseId = $(this).attr("data-id");
+            var studentId=/*[[${session.student.id}]]*/+"";
+            var url=/*[[@{/workbench/student/addStuCourse}]]*/+"";
+            $.ajax({
+                url : url,
+                type : "post",
+                data : {
+                    "courseId" : courseId,
+                    "studentId" : studentId
+                },
+                dataType : "json",
+                success : function(result) {
+                    if (result.code === "success") {
+                        alert(result.message);
+                        getCourses(5,1);
+                    } else {
+                        alert(result.message);
+                    }
+                }
+            })
+        })
+        getCourses(5,1);
+    })
+    function getCourses(pageSize,pageNum) {
+        var url=/*[[@{/workbench/student/getCourseList}]]*/+"";
+        var studentId=/*[[${session.student.id}]]*/+"";
+        $.ajax({
+            url : url,
+            type : "post",
+            data : {
+                "pageSize" : pageSize,
+                "pageNum" : pageNum,
+                "studentId" : studentId
+            },
+            dataType : "json",
+            success : function(data) {
+                if (data.code=== "success") {
+                    var html="";
+                    $.each(data.data.data,function (index,item) {
+                        html+="<div class=\"courseDiv row border-top ms-2\">";
+                        html+="    <p class=\"col-1 mt-3\">"+item.courseId+"</p>";
+                        html+="    <p class=\"col-2 mt-3\">"+item.courseName+"</p>";
+                        html+="    <p class=\"col-1 mt-3\">"+item.credit+"</p>";
+                        html+="    <p class=\"col-1 mt-3\">"+item.theoryHour+"</p>";
+                        html+="    <p class=\"col-1 mt-3\">"+item.praticeHour+"</p>";
+                        html+="    <p class=\"col-1 mt-3\">"+item.examMode+"</p>";
+                        html+="    <p class=\"col-1 mt-3\"><a href='#' data-id='"+item.id+"' class=\"saveScBtn\">选课</a></p>";
+                        html+="</div>";
+                    })
+                    $("#dataDiv").html(html);
+                    new Pagination({
+                        element: '#pageDiv', // 渲染的容器  [必填]
+                        layout: 'total,sizes,home, prev, pager, next, last', // [必填]
+                        pageIndex: pageNum, // 当前页码 [非必填]
+                        pageSize: pageSize, // 每页显示条数
+                        total: data.data.length, // 数据总条数 [必填]
+                        currentChange: function (index, pageSize) { // 页码
+                            getCourses(pageSize,index);
+                        }
+                    });
+                }else {
+                    alert(data.message);
+                }
+            }
+        })
+    }
+    function getCoursesByCondition(pageSize,pageNum,courseName,courseId) {
+        var url=/*[[@{/workbench/student/getCourseListByCondition}]]*/+"";
+        var studentId=/*[[${session.student.id}]]*/+"";
+        $.ajax({
+            url : url,
+            type : "post",
+            data : {
+                "pageSize" : pageSize,
+                "pageNum" : pageNum,
+                "studentId" : studentId,
+                "courseName" : courseName,
+                "courseId" : courseId
+            },
+            dataType : "json",
+            success : function(data) {
+                if (data.code=== "success") {
+                    var html="";
+                    $.each(data.data.data,function (index,item) {
+                        html+="<div class=\"courseDiv row border-top ms-2\">";
+                        html+="    <p class=\"col-1 mt-3\">"+item.courseId+"</p>";
+                        html+="    <p class=\"col-2 mt-3\">"+item.courseName+"</p>";
+                        html+="    <p class=\"col-1 mt-3\">"+item.credit+"</p>";
+                        html+="    <p class=\"col-1 mt-3\">"+item.theoryHour+"</p>";
+                        html+="    <p class=\"col-1 mt-3\">"+item.praticeHour+"</p>";
+                        html+="    <p class=\"col-1 mt-3\">"+item.examMode+"</p>";
+                        html+="    <p class=\"col-1 mt-3\"><a href='#' data-id='"+item.id+"' class=\"saveScBtn\">选课</a></p>";
+                        html+="</div>";
+                    })
+                    $("#dataDiv").html(html);
+                    new Pagination({
+                        element: '#pageDiv', // 渲染的容器  [必填]
+                        layout: 'total,sizes,home, prev, pager, next, last', // [必填]
+                        pageIndex: pageNum, // 当前页码 [非必填]
+                        pageSize: pageSize, // 每页显示条数
+                        total: data.data.length, // 数据总条数 [必填]
+                        currentChange: function (index, pageSize) { // 页码
+                            getCoursesByCondition(pageSize,index,courseName,courseId);
+                        }
+                    });
+                }else {
+                    alert(data.message);
+                }
+            }
+        })
+    }
+</script>
+<style type="text/css">
+    a{
+        color: black;
+        text-decoration: none;
+    }
+    a:hover{
+        color: #0c63e4;
+    }
+    .courseDiv{
+        height: 50px;
+        /*background-color: #cff4fc;*/
+    }
+    .courseDiv:hover{
+        background-color: #86b7fe;
+    }
+</style>
+<body>
+        <div id="controlDiv">
+            <form  class="py-4 row">
+                <div class="col-2">
+                    <input type="text" name="courseName" placeholder="课程名" class="form-control" id="courseName">
+                </div>
+                <div class="col-2">
+                    <input id="courseId" type="text" name="courseId" placeholder="课程编号" class="form-control">
+                </div>
+                <div class="col-1">
+                    <button type="button" class="btn btn-primary" id="queryBtn">查询</button>
+                </div>
+            </form>
+        </div>
+        <p>课程列表</p>
+        <hr>
+        <div>
+            <div class="courseDiv row small text-muted ms-2">
+                <p class="col-1 mt-3">课程编号</p>
+                <p class="col-2 mt-3">课程名</p>
+                <p class="col-1 mt-3">学分</p>
+                <p class="col-1 mt-3">理论课时</p>
+                <p class="col-1 mt-3">实践课时</p>
+                <p class="col-1 mt-3">考核方式</p>
+            </div>
+            <div id="dataDiv">
+<!--                <div class="courseDiv row border-top ms-2">-->
+<!--                    <p class="col-1 mt-3">CK67HU</p>-->
+<!--                    <p class="col-2 mt-3">高等数学</p>-->
+<!--                    <p class="col-1 mt-3">3</p>-->
+<!--                    <p class="col-1 mt-3">48</p>-->
+<!--                    <p class="col-1 mt-3">32</p>-->
+<!--                    <p class="col-1 mt-3">期末测试</p>-->
+<!--                    <p class="col-1 mt-3"><a href="#">选课</a></p>-->
+<!--                </div>-->
+            </div>
+            <div id="pageDiv"></div>
+        </div>
+</body>
+</html>

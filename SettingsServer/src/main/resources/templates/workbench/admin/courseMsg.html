@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" type="text/css">
+<link rel="stylesheet" th:href="@{/css/pagination.min.css}" type="text/css">
+<script type="text/javascript" th:src="@{/js/bootstrap.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/jquery-3.6.0.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/pagination.js}"></script>
+<script type="text/javascript" th:inline="javascript">
+    $(function() {
+        // alert("加载数据！");
+        $("#totalCheckbox").on("click", function () {
+            $(".oneCheckbox").prop("checked", $(this).prop("checked"))
+        })
+        $("#dateDiv").on("click",".queryScBtn",function() {
+            var courseId=$(this).attr("data-id");
+            console.log(courseId);
+            //     发送请求——》传递参数，把这个保存到页面隐藏域，页面初始化时加载数据
+            var href=/*[[@{/workbench/admin/CourseStudent}]]*/+"";
+            window.location.href=href+"?courseId="+courseId;
+        })
+        $(".oneCheckbox").on("click", function () {
+            //选择被选中的单选框
+            if ($(".oneCheckbox:checked").length === $(".oneCheckbox").length) {
+                $("#totalCheckbox").prop("checked", true);
+            } else {
+                $("#totalCheckbox").prop("checked", false);
+            }
+        })
+        $("#addBtn").on("click", function () {
+            $("#addModal").modal("show");
+        })
+        $("#setBtn").on("click", function () {
+            var ids = [];
+            $(".oneCheckbox:checked").each(function (index, item) {
+                ids.push($(item).attr("data-id"));
+            })
+            if (ids.length === 0) {
+                alert("请选择要设置的课程！");
+                return;
+            }
+            if (ids.length > 1) {
+                alert("只能设置一个课程！");
+                return;
+            }
+            var url=/*[[@{/workbench/admin/course/queryById}]]*/+"";
+            $.ajax({
+                url:url,
+                data:{"id":ids[0]},
+                dataType:"json",
+                type:"post",
+                success : function(data) {
+                    if (data.code === "success") {
+                        $("#editForm input[name='courseId']").val(data.data.courseId);
+                        $("#editForm input[name='courseName']").val(data.data.courseName);
+                        $("#editForm input[name='credit']").val(data.data.credit);
+                        $("#editForm input[name='theoryHour']").val(data.data.theoryHour);
+                        $("#editForm input[name='praticeHour']").val(data.data.praticeHour);
+                        $("#editForm input[name='examMode']").val(data.data.examMode);
+                        $("#editModal").modal("show");
+                    } else {
+                        alert(data.message);
+                    }
+                }
+            })
+        })
+        $("#removeBtn").on("click", function () {
+            //获取被选中的复选框
+            var checkboxs = $(".oneCheckbox:checked");
+            if (checkboxs.length === 0) {
+                alert("请选择要删除的数据！");
+                return;
+            }
+            if (confirm("确定要删除吗？")) {
+                var id = [];
+                checkboxs.each(function (index, item) {
+                    id.push($(item).attr("data-id"));
+                })
+                var url=/*[[@{/workbench/admin/course/delete}]]*/+"";
+                console.log("id="+id.join("&id="));
+                $.ajax({
+                    url: url,
+                    data: "id="+id.join("&id="),
+                    dataType: "json",
+                    type: "post",
+                    success: function (response) {
+                        if (response.code === "success") {
+                            alert("删除成功！");
+                            queryList(5,1);
+                        } else {
+                            alert("删除失败！");
+                        }
+                    }
+                })
+            }
+        })
+        $("#modalAddBtn").on("click", function () {
+           var serializeArray = $("#addForm").serializeArray();
+           var data = {};
+           var flag = true;
+           $.each(serializeArray, function (index, item) {
+               if ($.trim(item.value) === "") {
+                   alert(item.name+"不能为空！");
+                   flag = false;
+               }else {
+                   data[item.name] = $.trim(item.value);
+               }
+           })
+            if (!flag) {
+                return;
+            }
+            console.log(data);
+            var url=/*[[@{/workbench/admin/course/save}]]*/+"";
+           $.ajax({
+               url:url,
+               data:serializeArray,
+               type : "post",
+               dataType : "json",
+                success:function (response) {
+                     if (response.code === "success") {
+                          alert("添加成功！");
+                         $("#addForm")[0].reset();
+                         $("#addModal").modal("hide");
+                         queryList(5,1);
+                     } else {
+                          alert("添加失败！");
+                          $("#addForm")[0].reset();
+                     }
+                }
+           })
+        })
+        queryList(5,1);
+        $("#queryBtn").on("click", function () {
+            var courseId = $("#courseIdParam").val();
+            var courseName = $("#courseNameParam").val();
+            queryListByCondition(5,1,courseName,courseId);
+        })
+        $("#modalEditBtn").on("click", function() {
+            var serializeArray = $("#editForm").serializeArray();
+            var data = {};
+            var flag = true;
+            $.each(serializeArray, function (index, item) {
+                if ($.trim(item.value) === "") {
+                    alert(item.name+"不能为空！");
+                    flag = false;
+                }else {
+                    data[item.name] = $.trim(item.value);
+                }
+            })
+            serializeArray.push({name:"id",value:$(".oneCheckbox:checked").attr("data-id")});
+            console.log(serializeArray);
+            if (!flag) {
+                return;
+            }
+            var url=/*[[@{/workbench/admin/course/update}]]*/+"";
+            $.ajax({
+                url:url,
+                data:serializeArray,
+                type : "post",
+                dataType : "json",
+                success:function (response) {
+                    if (response.code === "success") {
+                        alert(response.message);
+                        $("#editForm")[0].reset();
+                        $("#editModal").modal("hide");
+                        queryList(5,1);
+                    } else {
+                        alert(response.message);
+                    }
+                }
+            })
+        })
+
+    })
+    function queryList(pageSize,pageNum) {
+        var url=/*[[@{/workbench/admin/course/queryList}]]*/+"";
+        $.ajax({
+            url:url,
+            data:{
+                pageSize:pageSize,
+                pageNum:pageNum
+            },
+            type:"post",
+            success:function (data) {
+                    var html = "";
+                    $.each(data.data.data, function (index, item) {
+                        html+="<div class=\"courseDiv row border-top ms-2\">";
+                        html+="    <input type=\"checkbox\" class=\"col-1 mt-3 oneCheckbox\" data-id='"+item.id+"'>";
+                        html+="        <p class=\"col-1 mt-3\">"+item.courseId+"</p>";
+                        html+="        <p class=\"col-2 mt-3\"><a data-id='"+item.id+"' class='queryScBtn'>"+item.courseName+"</a></p>";
+                        html+="        <p class=\"col-1 mt-3\">"+item.credit+"</p>";
+                        html+="        <p class=\"col-1 mt-3\">"+item.theoryHour+"</p>";
+                        html+="        <p class=\"col-1 mt-3\">"+item.praticeHour+"</p>";
+                        html+="        <p class=\"col-1 mt-3\">"+item.examMode+"</p>";
+                        html+="</div>";
+                        $("#dateDiv").html(html);
+                        new Pagination({
+                            element: '.pageDiv', // 渲染的容器  [必填]
+                            layout: 'total,sizes,home, prev, pager, next, last', // [必填]
+                            pageIndex: pageNum, // 当前页码 [非必填]
+                            pageSize: pageSize, // 每页显示条数
+                            total: data.data.length, // 数据总条数 [必填]
+                            currentChange: function (index, pageSize) { // 页码
+                                queryList(pageSize, index);
+                            }
+                        });
+                    })
+            }
+        })
+    }
+    function queryListByCondition(pageSize,pageNum,courseName,courseId) {
+        var url=/*[[@{/workbench/admin/course/queryListByCondition}]]*/+"";
+        $.ajax({
+            url:url,
+            data:{
+                pageSize:pageSize,
+                pageNum:pageNum,
+                courseName:courseName,
+                courseId:courseId
+            },
+            type:"post",
+            success:function (data) {
+                var html = "";
+                $.each(data.data.data, function (index, item) {
+                    html+="<div class=\"courseDiv row border-top ms-2\">";
+                    html+="    <input type=\"checkbox\" class=\"col-1 mt-3 oneCheckbox\" data-id='"+item.id+"'>";
+                    html+="        <p class=\"col-1 mt-3\">"+item.courseId+"</p>";
+                    html+="        <p class=\"col-2 mt-3\"><a data-id='"+item.id+"' class='queryScBtn'>"+item.courseName+"</a></p>";
+                    html+="        <p class=\"col-1 mt-3\">"+item.credit+"</p>";
+                    html+="        <p class=\"col-1 mt-3\">"+item.theoryHour+"</p>";
+                    html+="        <p class=\"col-1 mt-3\">"+item.praticeHour+"</p>";
+                    html+="        <p class=\"col-1 mt-3\">"+item.examMode+"</p>";
+                    html+="</div>";
+                    $("#dateDiv").html(html);
+                    new Pagination({
+                        element: '.pageDiv', // 渲染的容器  [必填]
+                        layout: 'total,sizes,home, prev, pager, next, last', // [必填]
+                        pageIndex: pageNum, // 当前页码 [非必填]
+                        pageSize: pageSize, // 每页显示条数
+                        total: data.data.length, // 数据总条数 [必填]
+                        currentChange: function (index, pageSize) { // 页码
+                            queryListByCondition(pageSize, index,courseName,courseId);
+                        }
+                    });
+                })
+            }
+        })
+    }
+</script>
+<style type="text/css">
+    a{
+        color: black;
+        text-decoration: none;
+    }
+    a:hover{
+        color: #0c63e4;
+    }
+    .courseDiv{
+        height: 50px;
+        /*background-color: #cff4fc;*/
+    }
+    .courseDiv:hover{
+        background-color: #86b7fe;
+    }
+    .modal-body div{
+        margin-bottom: 15px;
+    }
+</style>
+<body>
+<div id="controlDiv">
+    <form  class="py-4 row">
+        <div class="col-2">
+            <input type="text" name="courseName" placeholder="课程名" class="form-control" id="courseNameParam">
+        </div>
+        <div class="col-2">
+            <input id="courseIdParam" type="text" name="courseId" placeholder="课程编号" class="form-control">
+        </div>
+        <div class="col-1">
+            <button type="button" class="btn btn-primary" id="queryBtn">查询</button>
+        </div>
+    </form>
+    <div class="my-3">
+        <button type="button" class="btn btn-primary" id="addBtn">增加</button>
+        <button type="button" class="btn btn-secondary mx-3" id="setBtn">修改</button>
+        <button type="button" class="btn btn-danger" id="removeBtn">删除</button>
+    </div>
+</div>
+<p>课程列表</p>
+<hr>
+<div>
+    <div class="courseDiv row small text-muted ms-2">
+        <input type="checkbox" class="col-1 mt-3" id="totalCheckbox">
+        <p class="col-1 mt-3">课程编号</p>
+        <p class="col-2 mt-3">课程名</p>
+        <p class="col-1 mt-3">学分</p>
+        <p class="col-1 mt-3">理论课时</p>
+        <p class="col-1 mt-3">实践课时</p>
+        <p class="col-1 mt-3">考核方式</p>
+    </div>
+    <div id="dateDiv">
+<!--        <div class="courseDiv row border-top ms-2">-->
+<!--            <input type="checkbox" class="col-1 mt-3 oneCheckbox">-->
+<!--            <p class="col-1 mt-3">CK67HU</p>-->
+<!--            <p class="col-2 mt-3">高等数学</p>-->
+<!--            <p class="col-1 mt-3">3</p>-->
+<!--            <p class="col-1 mt-3">48</p>-->
+<!--            <p class="col-1 mt-3">32</p>-->
+<!--            <p class="col-1 mt-3">期末测试</p>-->
+<!--        </div>-->
+    </div>
+    <div class="pageDiv ms-0"></div>
+    <div class="modal" tabindex="-1" id="addModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">添加课程</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addForm" class="my-3">
+                        <div class="form-group">
+                            <input type="text" class="form-control" name="courseName" placeholder="课程名">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control" name="courseId" placeholder="课程编号">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control" name="credit" placeholder="学分">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control" name="theoryHour" placeholder="理论课时">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control" name="praticeHour" placeholder="实践课时">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control" name="examMode" placeholder="考核方式">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="modalAddBtn">添加</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal" tabindex="-1" id="editModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">修改课程</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editForm" class="my-3">
+                        <div class="form-group">
+                            <input type="text" class="form-control" name="courseName" placeholder="课程名">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control" name="courseId" placeholder="课程编号">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control" name="credit" placeholder="学分">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control" name="theoryHour" placeholder="理论课时">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control" name="praticeHour" placeholder="实践课时">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control" name="examMode" placeholder="考核方式">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="modalEditBtn">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
