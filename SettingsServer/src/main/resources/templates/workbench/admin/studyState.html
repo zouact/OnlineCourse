@@ -13,8 +13,8 @@
     $(function() {
         getList(5,1);
         $("#queryBtn").on("click",function () {
-            var studentName = $("#studentNameParam").val();
-            var studentId = $("#studentIdParam").val();
+            var studentName = $.trim($("#studentNameParam").val());
+            var studentId = $.trim($("#studentIdParam").val());
             getListByCondition(5,1,studentName,studentId);
         });
     })
@@ -58,6 +58,10 @@
         })
     }
     function getListByCondition(pageSize,pageNum,studentName,studentId) {
+        if(studentName===""&&studentId===""){
+            getList(pageSize,pageNum);
+            return;
+        }
         var url=/*[[@{/workbench/stuCourse/getStudentStateByCondition}]]*/+"";
         $.ajax({
             url : url,
@@ -91,7 +95,7 @@
                         pageSize: pageSize, // 每页显示条数
                         total: data.data.length, // 数据总条数 [必填]
                         currentChange: function (index, pageSize) { // 页码
-                            getListByCondition(pageSize, index);
+                            getListByCondition(pageSize, index,studentName,studentId);
                         }
                     });
                 }

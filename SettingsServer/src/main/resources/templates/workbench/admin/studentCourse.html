@@ -56,7 +56,7 @@
                         pageSize: pageSize, // 每页显示条数
                         total: data.data.length, // 数据总条数 [必填]
                         currentChange: function (index, pageSize) { // 页码
-                            getList(pageSize, index, stuId);
+                            getList(pageSize, index);
                         }
                     });
                 }
@@ -98,7 +98,7 @@
                         pageSize: pageSize, // 每页显示条数
                         total: data.data.length, // 数据总条数 [必填]
                         currentChange: function (index, pageSize) { // 页码
-                            getList(pageSize, index, stuId);
+                            getListOK(pageSize, index);
                         }
                     });
                 }

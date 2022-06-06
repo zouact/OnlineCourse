@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.master.springcloud.server.workbench.mapper.CourseMapper">
+
+    <resultMap id="BaseResultMap" type="com.master.springcloud.server.workbench.domain.Course">
+            <id property="id" column="id" jdbcType="VARCHAR"/>
+            <result property="courseId" column="course_id" jdbcType="VARCHAR"/>
+            <result property="courseName" column="course_name" jdbcType="VARCHAR"/>
+            <result property="credit" column="credit" jdbcType="INTEGER"/>
+            <result property="theoryHour" column="theory_hour" jdbcType="INTEGER"/>
+            <result property="praticeHour" column="pratice_hour" jdbcType="VARCHAR"/>
+            <result property="examMode" column="exam_mode" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,course_id,course_name,
+        credit,theory_hour,pratice_hour,
+        exam_mode
+    </sql>
+    <select id="getCourseList" resultType="com.master.springcloud.server.workbench.domain.Course">
+        SELECT *
+        from course
+        where id not in (select course_id from stu_course where student_id=#{studentId})
+    </select>
+    <select id="getCourseListByCondition" resultType="com.master.springcloud.server.workbench.domain.Course">
+        SELECT *
+        from course
+        where id not in (select course_id from stu_course where student_id=#{studentId})
+        <if test="courseId != null and courseId != ''">
+            and course_id like concat('%',#{courseId},'%')
+        </if>
+        <if test="courseName != null and courseName!=''">
+            and course_name like concat('%',#{courseName},'%')
+        </if>
+    </select>
+
+    <select id="getCourseListNum" resultType="java.lang.Integer">
+        SELECT count(id)
+        from course
+        where id not in (select course_id from stu_course where student_id=#{studentId})
+    </select>
+    <select id="getCourseListNumByCondition" resultType="java.lang.Integer">
+        SELECT count(id)
+        from course
+        where id not in (select course_id from stu_course where student_id=#{studentId})
+        <if test="courseId != null and courseId != ''">
+            and course_id like concat('%',#{courseId},'%')
+        </if>
+        <if test="courseName != null and courseName != ''">
+            and course_name like concat('%',#{courseName},'%')
+        </if>
+    </select>
+
+</mapper>

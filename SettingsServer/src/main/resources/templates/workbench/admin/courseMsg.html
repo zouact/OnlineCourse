@@ -213,6 +213,10 @@
     }
     function queryListByCondition(pageSize,pageNum,courseName,courseId) {
         var url=/*[[@{/workbench/admin/course/queryListByCondition}]]*/+"";
+        if (courseName === "" && courseId === "") {
+            queryList(pageSize,pageNum);
+            return;
+        }
         $.ajax({
             url:url,
             data:{

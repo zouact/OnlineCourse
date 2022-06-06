@@ -1,5 +1,6 @@
 package com.master.springcloud.server.settings.config;
 
+import com.master.springcloud.server.settings.domain.Admin;
 import com.master.springcloud.server.settings.domain.Student;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -12,9 +13,9 @@ public class StuInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         Student student = (Student) request.getSession().getAttribute("student");
-        if (student == null) {
+        Admin admin = (Admin) request.getSession().getAttribute("admin");
+        if (student == null && admin == null) {
             String contextPath = request.getContextPath();
-
             response.sendRedirect(contextPath+"/");
             return false;
         }else {

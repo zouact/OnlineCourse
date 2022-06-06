@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.master.springcloud.server.workbench.mapper.StudentMapper">
+
+    <resultMap id="BaseResultMap" type="com.master.springcloud.server.workbench.domain.Student">
+            <id property="id" column="id" jdbcType="VARCHAR"/>
+            <result property="account" column="account" jdbcType="VARCHAR"/>
+            <result property="password" column="password" jdbcType="VARCHAR"/>
+            <result property="studentName" column="student_name" jdbcType="VARCHAR"/>
+            <result property="studentId" column="student_id" jdbcType="CHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,account,password,
+        student_name,student_id
+    </sql>
+    <select id="getStudentStateList" resultType="com.master.springcloud.server.workbench.domain.StudentState">
+        SELECT s.student_name,s.student_id,s.id,AVG(score) as average_score
+        from student s
+        JOIN stu_course sc on s.id=sc.student_id
+        group by s.id
+        ORDER BY average_score desc
+    </select>
+    <select id="getStudentStateListByCondition"
+            resultType="com.master.springcloud.server.workbench.domain.StudentState">
+        SELECT s.student_name,s.student_id,s.id,AVG(score) as average_score
+        from student s
+        JOIN stu_course sc on s.id=sc.student_id
+        <where>
+            <if test="studentId != null">
+                AND s.student_id like Concat('%',#{studentId},'%')
+            </if>
+            <if test="studentName != null">
+                AND s.student_name like CONCAT('%',#{studentName},'%')
+            </if>
+        </where>
+        group by s.id
+        ORDER BY average_score desc
+    </select>
+    <select id="getStudentStateByStuId"
+            resultType="com.master.springcloud.server.workbench.domain.StudentState">
+        SELECT s.student_name,s.student_id,s.id,AVG(score) as average_score
+        from student s
+        JOIN stu_course sc on s.id=sc.student_id
+        WHERE s.id=#{studentId}
+        group by s.id
+    </select>
+
+</mapper>

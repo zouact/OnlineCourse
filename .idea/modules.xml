@@ -6,6 +6,7 @@
       <module fileurl="file://$PROJECT_DIR$/SettingsServer/SettingsServer.iml" filepath="$PROJECT_DIR$/SettingsServer/SettingsServer.iml" />
       <module fileurl="file://$PROJECT_DIR$/SpringCloudProject/SpringCloudProject.iml" filepath="$PROJECT_DIR$/SpringCloudProject/SpringCloudProject.iml" />
       <module fileurl="file://$PROJECT_DIR$/WorkbenchServer/WorkbenchServer.iml" filepath="$PROJECT_DIR$/WorkbenchServer/WorkbenchServer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/WorkbenchServerSlave/WorkbenchServerSlave.iml" filepath="$PROJECT_DIR$/WorkbenchServerSlave/WorkbenchServerSlave.iml" />
     </modules>
   </component>
 </project>

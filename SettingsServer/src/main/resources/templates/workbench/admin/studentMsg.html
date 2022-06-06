@@ -57,6 +57,10 @@
     }
     function queryListByCondition(pageSize,pageNum,studentName,studentId){
         var url=/*[[@{/workbench/student/queryByCondition}]]*/+"";
+        if(studentName===""&&studentId===""){
+            queryList(pageSize,pageNum);
+            return;
+        }
         $.ajax({
             url: url,
             type: "post",
@@ -87,7 +91,7 @@
                         pageSize: pageSize, // 每页显示条数
                         total: data.data.length, // 数据总条数 [必填]
                         currentChange: function (index, pageSize) { // 页码
-                            queryListByCondition(pageSize, index);
+                            queryListByCondition(pageSize, index,studentName,studentId);
                         }
                     });
                 }

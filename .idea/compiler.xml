@@ -8,6 +8,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="EurekaServer" />
+        <module name="WorkbenchServerSlave" />
         <module name="SettingsServer" />
         <module name="WorkbenchServer" />
       </profile>
@@ -19,6 +20,7 @@
       <module name="SettingsServer" target="1.8" />
       <module name="SpringCloudProject" target="1.8" />
       <module name="WorkbenchServer" target="1.8" />
+      <module name="WorkbenchServerSlave" target="1.8" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
@@ -29,6 +31,7 @@
       <module name="SettingsServer" options="-parameters" />
       <module name="SpringCloudProject" options="-parameters" />
       <module name="WorkbenchServer" options="-parameters" />
+      <module name="WorkbenchServerSlave" options="-parameters" />
     </option>
   </component>
 </project>
