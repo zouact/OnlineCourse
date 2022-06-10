@@ -22,7 +22,7 @@
             var href=/*[[@{/workbench/admin/CourseStudent}]]*/+"";
             window.location.href=href+"?courseId="+courseId;
         })
-        $(".oneCheckbox").on("click", function () {
+        $("#dateDiv").on("click",".oneCheckbox",function() {
             //选择被选中的单选框
             if ($(".oneCheckbox:checked").length === $(".oneCheckbox").length) {
                 $("#totalCheckbox").prop("checked", true);
