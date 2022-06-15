@@ -57,6 +57,11 @@ public class StuCourseServiceImpl extends ServiceImpl<StuCourseMapper, StuCourse
     public IPage<CourseStudent> getCourseStudentOK(String courseId, Page<CourseStudent> page) {
         return stuCourseMapper.getCourseStudentOK(courseId, page);
     }
+
+    @Override
+    public Boolean deleteStuCourseById(List<String> ids) {
+        return stuCourseMapper.deleteStuCourseById(ids);
+    }
 }
 
 

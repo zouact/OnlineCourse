@@ -17,6 +17,13 @@
         id,student_id,course_id,
         score,exam_date
     </sql>
+    <delete id="deleteStuCourseById">
+        delete from stu_course
+        where stu_course.course_id in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
     <select id="getStudentCourse" resultType="com.master.springcloud.server.workbench.domain.StudentCourse">
         select sc.id,c.course_id,c.course_name,c.credit,c.theory_hour,c.pratice_hour,c.exam_mode,sc.score,sc.exam_date
         from stu_course sc

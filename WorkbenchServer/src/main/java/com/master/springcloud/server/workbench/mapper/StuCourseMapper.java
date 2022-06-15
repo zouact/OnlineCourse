@@ -30,6 +30,8 @@ public interface StuCourseMapper extends BaseMapper<StuCourse> {
 
     public IPage<CourseStudent> getCourseStudentOK(@Param("courseId") String courseId, Page<CourseStudent> page);
 
+    public Boolean deleteStuCourseById(@Param("ids") List<String> ids);
+
 }
 
 

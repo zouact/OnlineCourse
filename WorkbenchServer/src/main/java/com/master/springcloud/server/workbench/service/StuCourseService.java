@@ -37,4 +37,6 @@ public interface StuCourseService extends IService<StuCourse> {
     public IPage<CourseStudent> getCourseStudent(String courseId, Page<CourseStudent> page);
 
     public IPage<CourseStudent> getCourseStudentOK(String courseId, Page<CourseStudent> page);
+
+    public Boolean deleteStuCourseById(List<String> ids);
 }

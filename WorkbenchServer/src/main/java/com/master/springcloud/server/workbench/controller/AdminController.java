@@ -5,8 +5,10 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.master.springcloud.server.workbench.domain.Admin;
 import com.master.springcloud.server.workbench.domain.Course;
+import com.master.springcloud.server.workbench.domain.StuCourse;
 import com.master.springcloud.server.workbench.service.AdminService;
 import com.master.springcloud.server.workbench.service.CourseService;
+import com.master.springcloud.server.workbench.service.StuCourseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +21,7 @@ import java.util.List;
 public class AdminController {
     final private AdminService adminService;
     final private CourseService courseService;
+    final private StuCourseService stuCourseService;
 
     @PostMapping("/query")
     public Admin queryAdmin(@RequestBody Admin admin) {
@@ -91,7 +94,7 @@ public class AdminController {
     public Boolean deleteCourse(@RequestParam("id") String[] id) {
 //        数组转为集合
         List<String> idList = java.util.Arrays.asList(id);
-        return courseService.removeByIds(idList);
+        return courseService.removeByIds(idList) && stuCourseService.remove(new QueryWrapper<StuCourse>().in("course_id", idList));
     }
 
 }
